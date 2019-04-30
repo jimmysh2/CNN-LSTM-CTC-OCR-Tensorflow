@@ -22,8 +22,8 @@ tf.app.flags.DEFINE_boolean('restore', False, 'whether to restore from the lates
 tf.app.flags.DEFINE_string('checkpoint_dir', './checkpoint/', 'the checkpoint dir')
 tf.app.flags.DEFINE_float('initial_learning_rate', 1e-3, 'inital lr')
 
-tf.app.flags.DEFINE_integer('image_height', 55, 'image height')
-tf.app.flags.DEFINE_integer('image_width', 167, 'image width')
+tf.app.flags.DEFINE_integer('image_height', 50, 'image height')
+tf.app.flags.DEFINE_integer('image_width', 150, 'image width')
 tf.app.flags.DEFINE_integer('image_channel', 1, 'image channels as input')
 
 tf.app.flags.DEFINE_integer('cnn_count', 4, 'count of cnn module to extract image features.')
@@ -31,7 +31,7 @@ tf.app.flags.DEFINE_integer('out_channels', 64, 'output channels of last layer i
 tf.app.flags.DEFINE_integer('num_hidden', 128, 'number of hidden units in lstm')
 tf.app.flags.DEFINE_float('output_keep_prob', 0.8, 'output_keep_prob in lstm')
 tf.app.flags.DEFINE_integer('num_epochs', 10000, 'maximum epochs')
-tf.app.flags.DEFINE_integer('batch_size', 40, 'the batch_size')
+tf.app.flags.DEFINE_integer('batch_size', 1, 'the batch_size')
 tf.app.flags.DEFINE_integer('save_steps', 1000, 'the step to save checkpoint')
 tf.app.flags.DEFINE_float('leakiness', 0.01, 'leakiness of lrelu')
 tf.app.flags.DEFINE_integer('validation_steps', 500, 'the step to validation')
@@ -49,7 +49,7 @@ tf.app.flags.DEFINE_string('val_dir', './imgs/val/', 'the val data dir')
 tf.app.flags.DEFINE_string('infer_dir', './imgs/infer/', 'the infer data dir')
 tf.app.flags.DEFINE_string('log_dir', './log', 'the logging dir')
 tf.app.flags.DEFINE_string('mode', 'train', 'train, val or infer')
-tf.app.flags.DEFINE_integer('num_gpus', 0, 'num of gpus')
+tf.app.flags.DEFINE_integer('num_gpus', 1, 'num of gpus')
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -83,13 +83,14 @@ class DataIterator:
                 # cv2.imshow('image',im)
 
                 # resize to same height, different width will consume time on padding
-                # im = cv2.resize(im, (image_width, image_height))
+                im = cv2.resize(im, (FLAGS.image_width, FLAGS.image_height))
                 im = np.reshape(im, [FLAGS.image_height, FLAGS.image_width, FLAGS.image_channel])
                 self.image.append(im)
 
                 # image is named as /.../<folder>/00000_abcd.png
-                code = image_name.split('/')[-1].split('_')[1].split('.')[0]
+                code = image_name.split('/')[-1].split('_')[-1].split('.')[0]
                 ###
+                ## convert year field from 2019 -> 19
                 code = code.split('-')
                 code[2] = code[2][2:]
                 code = '-'.join(code)

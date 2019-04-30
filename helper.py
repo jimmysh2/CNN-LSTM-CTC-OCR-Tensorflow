@@ -64,7 +64,7 @@ def load_labels(file):
 
 def load_img_path(images_path):
     tmp = os.listdir(images_path)
-    tmp.sort(key=lambda x: int(x.split('.')[0].split('-')[-1]))
+    tmp.sort(key=lambda x: int(x.split('.')[0].split('_')[2]))
 
     file_names = [images_path + s for s in tmp]
 
@@ -75,7 +75,7 @@ def load_img_path(images_path):
 #######
 def load_train_data(images_path):
     file_names = os.listdir(images_path)
-    file_names.sort(key=lambda x: int(x.split('.')[0].split('-')[-1]))
+    file_names.sort(key=lambda x: int(x.split('_')[-2]))
 
     file_paths = [images_path + s for s in file_names]
 
@@ -87,9 +87,10 @@ def load_train_data(images_path):
     # labels = ['-'.join( s.split('-').pop() ) for s in file_names]
     labels = []
     for s in file_names:
-        s = s.split('-')
-        del s[-1]
-        s = '-'.join(s)
+        # s = s.split('-')
+        # del s[-1]
+        # s = '-'.join(s)
+        s = s.split('_')[-1].split('.')[0]
         labels.append(s)
 
     labels = np.asarray(labels, dtype=str)
@@ -119,10 +120,11 @@ def cp_file(imgs_list_para, labels_list_para, dst_para):
         file_path = imgs_list_para[i]
 
         filename = os.path.basename(file_path)
-        fn = filename.split('.')[0]
-        ext = filename.split('.')[1]
+        # fn = filename.split('.')[0]
+        # ext = filename.split('.')[1]
 
-        dest_filename = dst_para + fn + '_' + labels_list_para[i] + '.' + ext
+        # dest_filename = dst_para + fn + '_' + labels_list_para[i] + '.' + ext
+        dest_filename = dst_para + filename
 
         shutil.copyfile(file_path, dest_filename)
 
@@ -137,13 +139,14 @@ if __name__ == '__main__':
     # image_path_list = load_img_path(images_path)
     # print(image_path_list[:10])
 
-    data_path = './imgs/SynData/'
+    data_path = './imgs/latest_data/'
+    # data_path = sys.argv[1]
     image_path_list, labels = load_train_data(data_path)
     m = len(labels)
     print("# of training images = {}".format(m))
     print(image_path_list[0], labels[0])
 
-    X_train, y_train, X_val, y_val = split_train_val(image_path_list, labels, int(0.8*m))
+    X_train, y_train, X_val, y_val = split_train_val(image_path_list, labels, int(0.75*m))
     write_to_file(X_train, "./imgs/X_train.txt")
     write_to_file(y_train, "./imgs/y_train.txt")
     write_to_file(X_val, "./imgs/X_val.txt")

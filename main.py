@@ -17,7 +17,7 @@ import helper
 
 FLAGS = utils.FLAGS
 
-logger = logging.getLogger('Traing for OCR using CNN+LSTM+CTC')
+logger = logging.getLogger('Training for OCR using CNN+LSTM+CTC')
 logger.setLevel(logging.INFO)
 
 
@@ -130,20 +130,20 @@ def train(train_dir=None, val_dir=None, mode='train'):
 def infer(img_path, mode='infer'):
     # imgList = load_img_path('/home/yang/Downloads/FILE/ml/imgs/image_contest_level_1_validate/')
     imgList = helper.load_img_path(img_path)
-    actual = []
-    for name in imgList:
-	    # code = name.split('/')[-1].split('_')[1].split('.')[0]
-	    code = '-'.join(name.split('/')[-1].split('-')[:-1])
-	    actual.append(code)
-    actual = np.asarray(actual)
+    # actual = []
+    # for name in imgList:
+	   #  # code = name.split('/')[-1].split('_')[1].split('.')[0]
+	   #  code = '-'.join(name.split('/')[-1].split('-')[:-1])
+	   #  actual.append(code)
+    # actual = np.asarray(actual)
     # MAX = 120
     # imgList = imgList[:MAX]
     print(imgList[:5])
-    # with open('./actual.txt', 'a') as f:
-    #         for name in imgList:
-    #             # code = name.split('/')[-1].split('_')[1].split('.')[0]
-    #             code = '-'.join(name.split('/')[-1].split('-')[:-1])
-    #             f.write(code + '\n')
+    with open('./actual.txt', 'w') as f:
+            for name in imgList:
+                code = name.split('/')[-1].split('_')[1].split('.')[0]
+                # code = '-'.join(name.split('/')[-1].split('-')[:-1])
+                f.write(code + '\n')
     # exit(1)
     # im = cv2.imread(imgList[0], cv2.IMREAD_GRAYSCALE).astype(np.float32) / 255.
     # cv2.imshow('image',im)
@@ -173,6 +173,7 @@ def infer(img_path, mode='infer'):
             for img in imgList[curr_step * FLAGS.batch_size: (curr_step + 1) * FLAGS.batch_size]:
                 # im = cv2.imread(img, 0).astype(np.float32) / 255.
                 im = cv2.imread(img, cv2.IMREAD_GRAYSCALE).astype(np.float32) / 255.
+                im = cv2.resize(im, (FLAGS.image_width, FLAGS.image_height))
                 im = np.reshape(im, [FLAGS.image_height, FLAGS.image_width, FLAGS.image_channel])
 
                 def get_input_lens(seqs):
@@ -202,27 +203,27 @@ def infer(img_path, mode='infer'):
 
                 decoded_expression.append(expression)
 
-        # with open('./result.txt', 'a') as f:
-        #     for code in decoded_expression:
-        #         f.write(code + '\n')
-        decoded_expression = np.asarray(decoded_expression)
-        imgList = np.asarray(imgList)
+        with open('./result.txt', 'w') as f:
+            for code in decoded_expression:
+                f.write(code + '\n')
+        # decoded_expression = np.asarray(decoded_expression)
+        # imgList = np.asarray(imgList)
 
         # print 6 corect and 6 incorrect predictions
-        c = decoded_expression == actual
-        w = decoded_expression != actual
-        correct = imgList[c]
-        wrong = imgList[w]
-        print("correct predictions:")
-        print(correct[:6])
-        print("********")
-        print("wrong predictions:")
-        print(wrong[:6])
-        print("********")
-        for i in range(6):
-        	print("prediction = {}".format(decoded_expression[w][i]))
-        	print("actual = {}".format(actual[w][i]))
-        	print("********")
+        # c = decoded_expression == actual
+        # w = decoded_expression != actual
+        # correct = imgList[c]
+        # wrong = imgList[w]
+        # print("correct predictions:")
+        # print(correct[:6])
+        # print("********")
+        # print("wrong predictions:")
+        # print(wrong[:6])
+        # print("********")
+        # for i in range(6):
+        # 	print("prediction = {}".format(decoded_expression[w][i]))
+        # 	print("actual = {}".format(actual[w][i]))
+        # 	print("********")
 
 
 
